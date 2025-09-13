@@ -88,7 +88,7 @@ const Onboarding = () => {
 
   const calculateCreatorType = () => {
     const answers = surveyAnswers;
-    let scores = {
+    const scores = {
       entertainer: 0,
       teacher: 0,
       tastemaker: 0,
