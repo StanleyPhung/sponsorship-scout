@@ -125,6 +125,7 @@ const Onboarding = () => {
         <Upload className="w-10 h-10 text-white" />
       </div>
       <h2 className="text-3xl font-bold mb-4">Share Your Best Content</h2>
+      <></>
       <p className="text-muted-foreground mb-8 max-w-md mx-auto">
         Paste links to 3-5 of your recent TikTok or Instagram videos so we can analyze your style
       </p>
