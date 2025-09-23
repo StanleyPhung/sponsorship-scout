@@ -1,4 +1,10 @@
 import { GoogleGenAI, Type } from "@google/genai";
+import fs from "fs";
+import path from "path";
+
+const fileBuffer = fs.readFileSync(
+  path.join(process.cwd(), "src/assets/testVideo.mp4"),
+);
 
 export default async function Page() {
   const ai = new GoogleGenAI({
@@ -8,8 +14,13 @@ export default async function Page() {
   let uploadResponse = null;
 
   try {
+    const fileBlob = new Blob([fileBuffer]);
+
     uploadResponse = await ai.files.upload({
-      file: "/Users/marcusphan/MarcusPhan/projects/sponsorship-scout/public/testVideo.mp4",
+      file: fileBlob,
+      config: {
+        mimeType: "video/mp4",
+      },
     });
 
     console.log("uploadResponse", uploadResponse);
