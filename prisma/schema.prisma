@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model User {
+  created_at       DateTime @default(now()) @db.Timestamptz(6)
+  username         String   @id @unique
+  likeCount        BigInt?
+  followerCount    BigInt?
+  videoCount       BigInt?
+  viewCount        BigInt?
+  content_profile  Json?
+  content_analysis Json?
+  profile_analysis Json?
+  recommendation   String?
+  element_strength Json?
+  Video            Video[]
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Video {
+  id                     String
+  created_at             DateTime @default(now()) @db.Timestamptz(6)
+  caption                String?
+  diggCount              Int?
+  commentCount           Int?
+  shareCount             Int?
+  username               String
+  playCount              Int?
+  collectCount           Int?
+  repostCount            Int?
+  ai_processed_output    Json?
+  engagement_rate        Float?   @db.Real
+  amplification_rate     Float?   @db.Real
+  engagement_score       Float?   @db.Real
+  reach_norm             Float?   @db.Real
+  engagement_rating      String?
+  evaluation             String?
+  video_analysis         Json?
+  engagement_adjusted    Decimal? @db.Decimal
+  amplification_adjusted Decimal? @db.Decimal
+  cluster                String?
+  User                   User     @relation(fields: [username], references: [username], onDelete: NoAction)
+
+  @@id([id, username])
+}

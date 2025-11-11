@@ -1,5 +1,8 @@
 # Welcome to your Lovable project from us
 
+## Prisma
+`npx dotenv -e .env.local --prisma db pull` to pull from Supabase, alternatively, edit `prisma/schema.prisma` to push new changes to Supabase
+
 ## Project info
 
 **URL**: https://lovable.dev/projects/d9fd0d59-e193-43cc-ab1b-72990a2b64ad
