@@ -17,10 +17,14 @@ import { FileListItem } from "./file-list-item"
 
 export type VibePickerProps = {
   nodes: FileNode[]
-  selectedFileIds: Set<string>
-  onToggleFile: (fileId: string) => void
-  onPreviewFile: (file: FileNode) => void
+  selectedFileIds?: Set<string>
+  onToggleFile?: (fileId: string) => void
+  onPreviewFile?: (file: FileNode) => void
+  onSelectVibe?: (file: FileNode) => void
   className?: string
+  title?: React.ReactNode
+  description?: React.ReactNode
+  showHeader?: boolean
 }
 
 export function VibePicker({
@@ -28,8 +32,14 @@ export function VibePicker({
   selectedFileIds,
   onToggleFile,
   onPreviewFile,
+  onSelectVibe,
   className,
+  title,
+  description,
+  showHeader = true,
 }: VibePickerProps) {
+  const selectionSet = selectedFileIds ?? new Set<string>()
+  const mentionMode = typeof onSelectVibe === "function"
   const getCheckboxId = React.useCallback((fileId: string) => {
     return `file-${fileId.replace(/[^a-zA-Z0-9_-]/g, "-")}`
   }, [])
@@ -53,7 +63,35 @@ export function VibePicker({
           )
         }
 
-        const isChecked = selectedFileIds.has(node.id)
+        if (mentionMode && onSelectVibe) {
+          return (
+            <button
+              key={node.id}
+              type="button"
+              className="w-full text-left"
+              onClick={() => onSelectVibe(node)}
+            >
+              <FileListItem
+                file={node}
+                onPreview={onPreviewFile}
+                className="cursor-pointer"
+                prefix={
+                  <span
+                    className="inline-flex h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: node.accentColor ?? "#94a3b8" }}
+                    aria-hidden
+                  />
+                }
+              />
+            </button>
+          )
+        }
+
+        if (!onToggleFile) {
+          return null
+        }
+
+        const isChecked = selectionSet.has(node.id)
         const checkboxId = getCheckboxId(node.id)
 
         return (
@@ -93,18 +131,25 @@ export function VibePicker({
         )
       })
     },
-    [getCheckboxId, onPreviewFile, onToggleFile, selectedFileIds]
+    [getCheckboxId, mentionMode, onPreviewFile, onSelectVibe, onToggleFile, selectionSet]
   )
+
+  const headerTitle = title ?? "Vibe Picker"
+  const headerDescription =
+    description ?? (
+      <>
+        Your styles, goals, and identities. <br />All in one place.
+      </>
+    )
 
   return (
     <Card className={cn("flex h-full flex-col lg:min-h-0", className)}>
-      <CardHeader>
-        <CardTitle>Vibe Picker</CardTitle>
-        <CardDescription>
-          Your styles, goals, and identities. <br/>
-          All in one place.
-        </CardDescription>
-      </CardHeader>
+      {showHeader ? (
+        <CardHeader>
+          <CardTitle>{headerTitle}</CardTitle>
+          {headerDescription ? <CardDescription>{headerDescription}</CardDescription> : null}
+        </CardHeader>
+      ) : null}
       <CardContent className="flex-1 overflow-hidden">
         <ScrollArea className="h-full">
           <div className="space-y-2 pb-4">{renderNodes(nodes)}</div>

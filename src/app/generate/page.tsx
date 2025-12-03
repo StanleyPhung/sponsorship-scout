@@ -3,7 +3,6 @@
 import * as React from "react"
 
 import { ConceptFeed } from "./components/concept-feed"
-import { ContextPanel } from "./components/context-panel"
 import { ThoughtProcessPanel } from "./components/thought-process-panel"
 import { VibePicker } from "./components/vibe-picker"
 import { PreviewDialog } from "./components/preview-dialog"
@@ -180,16 +179,13 @@ export default function GeneratorPage() {
             onToggleStar={handleToggleStar}
             onUpdateItem={handleUpdateFeedItem}
             fileLookup={fileMap}
+            activeFilters={selectedFiles}
+            onRemoveFilter={handleRemoveFile}
             className="lg:basis-[50%]"
           />
 
-          <div className="flex h-full flex-col gap-4 lg:basis-[30%] lg:overflow-hidden">
-            <ThoughtProcessPanel value={thoughtProcess} onChange={setThoughtProcess} />
-            <ContextPanel
-              files={selectedFiles}
-              onRemoveFile={handleRemoveFile}
-              onPreviewFile={handlePreviewFile}
-            />
+          <div className="flex h-full flex-col lg:basis-[30%] lg:overflow-hidden">
+            <ThoughtProcessPanel value={thoughtProcess} onChange={setThoughtProcess} className="flex-1" />
           </div>
         </div>
       </div>

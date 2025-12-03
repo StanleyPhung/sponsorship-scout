@@ -1,7 +1,7 @@
 "use client"
 
 import * as React from "react"
-import { PenSquare, Star } from "lucide-react"
+import { PenSquare, Star, X } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
@@ -28,6 +28,8 @@ export type ConceptFeedProps = {
   onUpdateItem: (itemId: string, updates: Pick<FeedItem, "title" | "body">) => void
   fileLookup: Record<string, FileNode>
   className?: string
+  activeFilters?: FileNode[]
+  onRemoveFilter?: (fileId: string) => void
 }
 
 const tagCategoryLabels: Record<TagCategory, string> = {
@@ -44,6 +46,8 @@ export function ConceptFeed({
   onUpdateItem,
   fileLookup,
   className,
+  activeFilters = [],
+  onRemoveFilter,
 }: ConceptFeedProps) {
   const scrollAreaRef = React.useRef<HTMLDivElement | null>(null)
   const sentinelRef = React.useRef<HTMLDivElement | null>(null)
@@ -112,6 +116,25 @@ export function ConceptFeed({
       <CardHeader>
         <CardTitle>Concept Feed</CardTitle>
         <CardDescription>Find your next viral idea.</CardDescription>
+        {activeFilters.length ? (
+          <div className="mt-3 flex flex-wrap gap-2">
+            {activeFilters.map((file) => (
+              <button
+                key={file.id}
+                type="button"
+                onClick={() => onRemoveFilter?.(file.id)}
+                className="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-xs font-medium transition hover:bg-muted"
+                style={{
+                  borderColor: file.accentColor ?? undefined,
+                  color: file.accentColor ?? undefined,
+                }}
+              >
+                <span>@{file.name}</span>
+                <X className="h-3 w-3" />
+              </button>
+            ))}
+          </div>
+        ) : null}
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden">
         <ScrollArea ref={scrollAreaRef} className="h-full">

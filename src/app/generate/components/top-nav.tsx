@@ -13,9 +13,10 @@ import { ThemeToggle } from "@/components/theme-toggle"
 import { cn } from "@/lib/utils"
 
 const navItems = [
+  { label: "Profile", href: "/profile" },
+  { label: "Research", href: "/research" },
   { label: "Generate", href: "/generate" },
   { label: "Plan", href: "/plan" },
-  { label: "Research", href: "/research" },
 ]
 
 export function GeneratorNav() {
