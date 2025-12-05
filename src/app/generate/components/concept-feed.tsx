@@ -252,9 +252,6 @@ export function ConceptFeed({
                             <Button type="button" onClick={handleSave}>
                               Save
                             </Button>
-                            <Button type="button" variant="secondary">
-                              Revise with AI
-                            </Button>
                           </div>
                         </div>
                       </div>
