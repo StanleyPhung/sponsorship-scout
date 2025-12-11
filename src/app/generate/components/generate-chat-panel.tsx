@@ -8,16 +8,14 @@ import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle,
 } from "@/components/ui/card"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 
-import { convertMarkdownToHtml } from "../../generate/utils"
+import { convertMarkdownToHtml } from "../utils"
 
 type ChatMessage = {
   id: string
@@ -31,53 +29,80 @@ const mockMessages: ChatMessage[] = [
     id: "assistant-1",
     role: "assistant",
     content:
-      "### Research kickoff\nDrop a creator detail or target sponsor to map insight summaries, positioning, and assets in one place.",
+      "### Thought Process\nShare your ideas, vision, and what makes your content unique. I'll help refine your concepts and provide suggestions.",
     timestamp: "2m ago",
-  },
-  {
-    id: "user-1",
-    role: "user",
-    content: "Looking for beauty brands that care about science-backed routines.",
-    timestamp: "Just now",
-  },
-  {
-    id: "assistant-2",
-    role: "assistant",
-    content:
-      "**CeraVe**, **Glow Recipe**, and **Skinfix** all lean into derm-backed claims.\n\n- Position on barrier repair + derm approval.\n- Offer split-script draft for TikTok + IG stories.\n- Suggest a carousel CTA with IRL before/after hooks.",
-    timestamp: "Just now",
   },
 ]
 
-type ResearchChatPanelProps = {
-  inputValue: string
-  onInputChange: (value: string) => void
+export type GenerateChatPanelProps = {
+  className?: string
 }
 
-export function ResearchChatPanel({ inputValue, onInputChange }: ResearchChatPanelProps) {
-  const handleSubmit = React.useCallback((event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    onInputChange("")
-  }, [onInputChange])
+export function GenerateChatPanel({ className }: GenerateChatPanelProps) {
+  const [messages, setMessages] = React.useState<ChatMessage[]>(mockMessages)
+  const [inputValue, setInputValue] = React.useState("")
+  const scrollRef = React.useRef<HTMLDivElement>(null)
+
+  const handleSubmit = React.useCallback(
+    (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault()
+      if (!inputValue.trim()) return
+
+      const userMessage: ChatMessage = {
+        id: `user-${Date.now()}`,
+        role: "user",
+        content: inputValue,
+        timestamp: "Just now",
+      }
+
+      setMessages((prev) => [...prev, userMessage])
+      setInputValue("")
+
+      // Simulate AI response
+      setTimeout(() => {
+        const aiMessage: ChatMessage = {
+          id: `assistant-${Date.now()}`,
+          role: "assistant",
+          content:
+            "Got it! I'll keep that in mind as we generate concepts together. Feel free to share more details about your vision.",
+          timestamp: "Just now",
+        }
+        setMessages((prev) => [...prev, aiMessage])
+      }, 1000)
+    },
+    [inputValue]
+  )
+
+  const handleNewThread = React.useCallback(() => {
+    setMessages(mockMessages)
+    setInputValue("")
+  }, [])
+
+  React.useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    }
+  }, [messages])
 
   return (
-    <Card className="flex h-full flex-col">
-      <CardHeader>
-        <div className="flex items-center justify-between gap-4">
-          <div className="space-y-1">
-            <CardTitle>Research Chat</CardTitle>
-            <CardDescription>Explore insights with AI-powered research.</CardDescription>
-          </div>
-          <Button variant="outline" size="sm" className="shrink-0">
+    <Card className={className}>
+      <CardHeader className="py-2">
+        <div className="flex items-center justify-end">
+          <Button
+            variant="outline"
+            size="sm"
+            className="shrink-0"
+            onClick={handleNewThread}
+          >
             <RefreshCcw className="mr-2 h-4 w-4" /> New Thread
           </Button>
         </div>
       </CardHeader>
       <Separator />
       <CardContent className="flex-1 overflow-hidden p-0">
-        <ScrollArea className="h-full">
+        <ScrollArea className="h-full" ref={scrollRef}>
           <div className="space-y-6 p-6">
-            {mockMessages.map((message) => {
+            {messages.map((message) => {
               const isAssistant = message.role === "assistant"
               const renderedContent = isAssistant
                 ? convertMarkdownToHtml(message.content)
@@ -117,8 +142,8 @@ export function ResearchChatPanel({ inputValue, onInputChange }: ResearchChatPan
         <form onSubmit={handleSubmit} className="w-full space-y-3">
           <Textarea
             value={inputValue}
-            onChange={(event) => onInputChange(event.target.value)}
-            placeholder="Ask for audience intel, brand talking points, or synthesis prompts"
+            onChange={(event) => setInputValue(event.target.value)}
+            placeholder="Share your ideas, vision, or ask questions about the concepts..."
             className="min-h-[120px] resize-none"
           />
           <div className="flex items-center gap-3">
@@ -126,7 +151,7 @@ export function ResearchChatPanel({ inputValue, onInputChange }: ResearchChatPan
               <Paperclip className="h-4 w-4" />
             </Button>
             <Button type="submit" className="flex-1" disabled={!inputValue.trim()}>
-              Send research prompt
+              Send message
               <Send className="ml-2 h-4 w-4" />
             </Button>
           </div>

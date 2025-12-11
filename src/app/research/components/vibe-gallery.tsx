@@ -4,7 +4,7 @@ import * as React from "react"
 import { ChevronLeft, ChevronRight, Search } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
 import { Input } from "@/components/ui/input"
 import { FileNode } from "@/app/generate/types"
@@ -72,13 +72,11 @@ export function VibeGallery({ sections, open, onOpenChange, onInsertVibe }: Vibe
       className="flex h-full w-full flex-col overflow-hidden"
     >
       <Card className="flex h-full flex-col border-dashed">
-        <div className="flex flex-col gap-3 border-b px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.35em] text-muted-foreground">
-                Vibe reference
-              </p>
-              <p className="text-lg font-semibold">Strategy, Themes & Brands</p>
+        <CardHeader>
+          <div className="flex items-center justify-between gap-4">
+            <div className="space-y-1">
+              <CardTitle>Strategy, Themes & Brands</CardTitle>
+              <CardDescription>Vibe reference</CardDescription>
             </div>
             <CollapsibleTrigger asChild>
               <Button variant="outline" size="icon" className="rounded-full">
@@ -89,7 +87,7 @@ export function VibeGallery({ sections, open, onOpenChange, onInsertVibe }: Vibe
               </Button>
             </CollapsibleTrigger>
           </div>
-          <div className="relative">
+          <div className="relative mt-3">
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               value={query}
@@ -98,7 +96,7 @@ export function VibeGallery({ sections, open, onOpenChange, onInsertVibe }: Vibe
               className="pl-9"
             />
           </div>
-        </div>
+        </CardHeader>
         <CollapsibleContent className="flex-1 overflow-hidden">
           {filteredSections.length === 0 ? (
             <div className="px-4 py-6 text-center text-sm text-muted-foreground">

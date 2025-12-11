@@ -3,7 +3,7 @@
 import * as React from "react"
 import { format } from "date-fns"
 
-import { GeneratorNav } from "../generate/components/top-nav"
+import { GeneratorNav } from "@/components/navigation"
 import { fileTreeData } from "../generate/data/file-tree"
 import { buildFileMap } from "../generate/utils"
 import { PlannerCalendar } from "./components/planner-calendar"

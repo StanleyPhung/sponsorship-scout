@@ -3,10 +3,10 @@
 import * as React from "react"
 
 import { ConceptFeed } from "./components/concept-feed"
-import { ThoughtProcessPanel } from "./components/thought-process-panel"
+import { GenerateChatPanel } from "./components/generate-chat-panel"
 import { VibePicker } from "./components/vibe-picker"
 import { PreviewDialog } from "./components/preview-dialog"
-import { GeneratorNav } from "./components/top-nav"
+import { GeneratorNav } from "@/components/navigation"
 import { fileTreeData } from "./data/file-tree"
 import { applyFileOverrides, buildFileMap } from "./utils"
 import { FeedItem, FileNode, FileNodeUpdate, TagCategory } from "./types"
@@ -70,7 +70,6 @@ const generateFeedItems = (
 }
 
 export default function GeneratorPage() {
-  const [thoughtProcess, setThoughtProcess] = React.useState("")
   const [selectedFileIds, setSelectedFileIds] = React.useState<Set<string>>(
     () => new Set()
   )
@@ -185,7 +184,7 @@ export default function GeneratorPage() {
           />
 
           <div className="flex h-full flex-col lg:basis-[30%] lg:overflow-hidden">
-            <ThoughtProcessPanel value={thoughtProcess} onChange={setThoughtProcess} className="flex-1" />
+            <GenerateChatPanel className="flex h-full flex-col" />
           </div>
         </div>
       </div>

@@ -48,13 +48,14 @@ export function SavedConceptsPanel({
 }: SavedConceptsPanelProps) {
   return (
     <Card className="flex h-full flex-col">
-      <div className="border-b px-4 py-3">
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-          Saved Concepts
-        </p>
-        <p className="text-lg font-semibold">{concepts.length} ideas</p>
-      </div>
-      <ScrollArea className="flex-1">
+      <CardHeader>
+        <div className="space-y-1">
+          <CardTitle>{concepts.length} ideas</CardTitle>
+          <CardDescription>Saved Concepts</CardDescription>
+        </div>
+      </CardHeader>
+      <CardContent className="flex-1 overflow-hidden p-0">
+        <ScrollArea className="h-full">
         <div className="space-y-4 p-4">
           {concepts.map((concept) => (
             <ConceptListItem
@@ -68,6 +69,7 @@ export function SavedConceptsPanel({
           ))}
         </div>
       </ScrollArea>
+      </CardContent>
     </Card>
   )
 }

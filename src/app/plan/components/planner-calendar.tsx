@@ -4,7 +4,7 @@ import { CheckCircle2, RefreshCw } from "lucide-react"
 import { DayContentProps } from "react-day-picker"
 
 import { Button } from "@/components/ui/button"
-import { Card } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Calendar } from "@/components/ui/calendar"
 
 import type { SavedConcept } from "../types"
@@ -66,24 +66,24 @@ export function PlannerCalendar({
 
   return (
     <Card className="flex h-full flex-col">
-      <div className="flex items-center justify-between gap-4 border-b px-4 py-3">
-        <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Publishing Calendar
-          </p>
-          <p className="text-lg font-semibold">{format(month, "MMMM yyyy")}</p>
+      <CardHeader>
+        <div className="flex items-center justify-between gap-4">
+          <div className="space-y-1">
+            <CardTitle>{format(month, "MMMM yyyy")}</CardTitle>
+            <CardDescription>Publishing Calendar</CardDescription>
+          </div>
+          <Button
+            variant={isSynced ? "secondary" : "outline"}
+            size="sm"
+            className="gap-2 whitespace-nowrap"
+            onClick={onToggleSync}
+          >
+            <SyncIcon className="h-4 w-4" />
+            {syncLabel}
+          </Button>
         </div>
-        <Button
-          variant={isSynced ? "secondary" : "outline"}
-          size="sm"
-          className="gap-2 whitespace-nowrap"
-          onClick={onToggleSync}
-        >
-          <SyncIcon className="h-4 w-4" />
-          {syncLabel}
-        </Button>
-      </div>
-      <div className="flex-1 overflow-auto p-2">
+      </CardHeader>
+      <CardContent className="flex-1 overflow-hidden p-2">
         <Calendar
           month={month}
           onMonthChange={onMonthChange}
@@ -105,7 +105,7 @@ export function PlannerCalendar({
           showOutsideDays={false}
           mode="single"
         />
-      </div>
+      </CardContent>
     </Card>
   )
 }
