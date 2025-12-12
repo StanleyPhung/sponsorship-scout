@@ -6,9 +6,9 @@ export function generateStaticParams() {
 }
 
 export default function Page({ params }: { params: { slug?: string[] } }) {
-  // Redirect root route ("/") to "/welcome"
+  // Redirect root route ("/") to "/generate"
   if (!params.slug || params.slug.length === 0) {
-    redirect("/welcome");
+    redirect("/generate");
   }
 
   return <ClientOnly />;
