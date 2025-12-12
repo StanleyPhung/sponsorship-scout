@@ -18,7 +18,7 @@
     "noUnusedLocals": false,
     "strictNullChecks": false,
     "esModuleInterop": true,
-    "jsx": "preserve",
+    "jsx": "react-jsx",
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
     "target": "esnext",
@@ -39,7 +39,8 @@
     "./dist/types/**/*.ts",
     "./next-env.d.ts",
     "./src",
-    ".next/types/**/*.ts"
+    ".next/types/**/*.ts",
+    "./dist/dev/types/**/*.ts"
   ],
   "exclude": [
     "./node_modules",
