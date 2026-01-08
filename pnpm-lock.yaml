@@ -5503,6 +5503,7 @@ packages:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 2731c18 (feat: chatbot with history + message renderer (#13))
   trim-lines@3.0.1:
@@ -5518,6 +5519,10 @@ packages:
 >>>>>>> 2731c18 (feat: chatbot with history + message renderer (#13))
   ts-api-utils@2.4.0:
     resolution: {integrity: sha512-3TaVTaAv2gTiMB35i3FiGJaRfwb3Pyn/j3m/bfAvGe8FB7CF6u+LMYqYlDh7reQf7UNvoTvdfAqHGmPGOSsPmA==}
+=======
+  ts-api-utils@2.3.0:
+    resolution: {integrity: sha512-6eg3Y9SF7SsAvGzRHQvvc1skDAhwI4YQ32ui1scxD1Ccr0G5qIIbUBT3pFTKX8kmWIQClHobtUdNuaBgwdfdWg==}
+>>>>>>> 8c9af3f (feat: update workflow (profile, research, generate, plan + new onboarding page))
     engines: {node: '>=18.12'}
     peerDependencies:
       typescript: '>=4.8.4'
@@ -11567,6 +11572,7 @@ snapshots:
 
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> 2731c18 (feat: chatbot with history + message renderer (#13))
   trim-lines@3.0.1: {}
@@ -11579,6 +11585,9 @@ snapshots:
 =======
 >>>>>>> 2731c18 (feat: chatbot with history + message renderer (#13))
   ts-api-utils@2.4.0(typescript@5.9.3):
+=======
+  ts-api-utils@2.3.0(typescript@5.9.3):
+>>>>>>> 8c9af3f (feat: update workflow (profile, research, generate, plan + new onboarding page))
     dependencies:
       typescript: 5.9.3
 
