@@ -19,10 +19,6 @@ RenderInputArea,
 } from "./conversationUI"
 
 import { Check } from "lucide-react"
-import { ThemeToggle } from "@/components/theme-toggle"
-
-
-
 
 export default function ConversationPage() {
 

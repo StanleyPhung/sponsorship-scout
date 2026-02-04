@@ -30,7 +30,7 @@ export default function AuthSignUp() {
       name,
       email,
       password,
-      callbackURL: "/onboarding",
+      callbackURL: "/conversation",
     });
     setBusy(false);
 
@@ -39,7 +39,7 @@ export default function AuthSignUp() {
       return;
     }
 
-    router.push("/onboarding");
+    router.push("/conversation");
   };
 
   return (
