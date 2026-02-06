@@ -24,7 +24,7 @@ export default function AuthSignIn() {
     const { error } = await authClient.signIn.email({
       email,
       password,
-      callbackURL: "/profile",
+      callbackURL: "/profile/2hungryguys",
     });
     setBusy(false);
 
@@ -33,7 +33,7 @@ export default function AuthSignIn() {
       return;
     }
 
-    router.push("/profile");
+    router.push("/profile/2hungryguys");
   };
 
   return (

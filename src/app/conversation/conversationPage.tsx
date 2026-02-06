@@ -18,6 +18,7 @@ import {
     TasteAnalysis,
 } from "./conversationUI"
 
+import { useMutation } from "@tanstack/react-query"
 import { Check } from "lucide-react"
 
 export default function ConversationPage() {
@@ -46,6 +47,38 @@ const [proposedGoals, setProposedGoals] = React.useState<string[]>([])
 const [editableGoals, setEditableGoals] = React.useState<string[]>([])
 const [isEditingGoals, setIsEditingGoals] = React.useState(false);
 
+const uploadAllTasteVideos = async (files: FileList | null) => {
+    if (!files) return
+    const fileArray = Array.from(files)
+    setTasteVideos((prev) => [...prev, ...fileArray])
+    
+    await Promise.all(
+      fileArray.map((file) =>
+        uploadTasteVideo.mutateAsync(file)
+      )
+    );
+  };
+
+//Upload event handlers
+const uploadTasteVideo = useMutation({
+    mutationFn: async (file: File) => {
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('userName', userName)
+      formData.append('category', 'taste-videos')
+
+      const response = await fetch('/api/v1/bucketUpload', {
+        method: 'PUT',
+        body: formData,
+      })
+
+      if (!response.ok) {
+        throw new Error('Upload failed')
+      }
+
+      return response.json()
+    },
+  });
 
 React.useEffect(() => {
 messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -69,7 +102,7 @@ if (currentStage === "welcome") {
 React.useEffect(() => {
 if (currentStage === "completion") {
     const timer = setTimeout(() => {
-    router.push("/profile")
+    router.push("/profile/2hungryguys")
     }, 2000)
     return () => clearTimeout(timer)
 }
@@ -137,13 +170,6 @@ setTimeout(() => {
     )
     setCurrentStage("awaiting-taste-videos")
 }, 67)
-}
-
-
-const handleTasteUpload = (files: FileList | null) => {
-if (!files) return
-const fileArray = Array.from(files)
-setTasteVideos((prev) => [...prev, ...fileArray])
 }
 
 const handleTasteAnalyze = async () => {
@@ -656,7 +682,7 @@ return (
                 isLoading={isLoading}
                 handleNameSubmit={handleNameSubmit}
                 handleTiktokUsernameSubmit={handleTiktokUsernameSubmit}
-                handleTasteUpload={handleTasteUpload}
+                handleTasteUpload={uploadAllTasteVideos}
                 handleTasteAnalyze={handleTasteAnalyze}
                 handleTasteValidation={handleTasteValidation}
                 handleTasteClarification={handleTasteClarification}

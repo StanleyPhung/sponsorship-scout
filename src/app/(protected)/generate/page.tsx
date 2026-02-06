@@ -75,7 +75,7 @@ export default function TestPage() {
         <div>
             <DeckPage />
 
-            <div className="fixed bottom-6 right-6 flex items-center gap-3">
+            {/* <div className="fixed bottom-6 right-6 flex items-center gap-3">
                 <AnimatePresence>
                     {showHints &&(
                         <motion.div
@@ -110,7 +110,7 @@ export default function TestPage() {
                         </motion.div>
                     )}
                 </AnimatePresence>
-            </div>
+            </div> */}
             {/* Floating Blob Button */}
 
             {/* Chat Panel */}

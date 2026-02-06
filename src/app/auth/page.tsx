@@ -18,7 +18,7 @@ export default function AuthPage() {
     setOauthBusy(true);
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: "/profile",
+      callbackURL: "/profile/2hungryguys",
       newUserCallbackURL: "/onboarding"
     });
 

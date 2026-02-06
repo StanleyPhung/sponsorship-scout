@@ -268,7 +268,9 @@ switch (currentStage) {
             Upload Videos
             </Button>
             <input id="taste-upload" type="file" accept="video/*" multiple onChange={(e) => handleTasteUpload(e.target.files)} className="hidden" />
-            {tasteVideos.length > 0 && <Button onClick={handleTasteAnalyze}>Analyze</Button>}
+            {tasteVideos.length > 0 && 
+                <Button onClick={handleTasteAnalyze}>Analyze</Button>
+            }
         </div>
         </div>
     )
