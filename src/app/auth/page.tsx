@@ -1,27 +1,50 @@
 "use client";
 
-import React, { useState } from "react";
-import AuthSignIn from "./components/AuthSignIn";
-import AuthSignUp from "./components/AuthSignUp";
 import AuthToggleButtons from "@/components/AuthToggleButtons";
-import Image from "next/image";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { authClient } from "@/lib/auth-client";
-
-import { ThemeToggle } from "@/components/theme-toggle";
+import { fetchUserByEmail } from "@/lib/user-data";
+import { useUserStore } from "@/store/user-store";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import AuthSignIn from "./components/AuthSignIn";
+import AuthSignUp from "./components/AuthSignUp";
 
 export default function AuthPage() {
+  const router = useRouter();
+  const { setEmail: setStoreEmail, setUsername: setStoreUsername } = useUserStore();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [oauthBusy, setOauthBusy] = useState(false);
+
+  // Check if user just signed in via OAuth and redirect to their profile
+  useEffect(() => {
+    const checkAuthAndRedirect = async () => {
+      const session = await authClient.getSession();
+      if (session?.data?.user?.email) {
+        try {
+          const userData = await fetchUserByEmail(session.data.user.email);
+          if (userData.username) {
+            setStoreEmail(session.data.user.email);
+            setStoreUsername(userData.username);
+            router.push(`/profile/${userData.username}`);
+          }
+        } catch (err) {
+          console.error("Failed to fetch user from Supabase after OAuth:", err);
+        }
+      }
+    };
+
+    checkAuthAndRedirect();
+  }, [router]);
 
   const continueWithGoogle = async () => {
     setOauthBusy(true);
     await authClient.signIn.social({
       provider: "google",
-      callbackURL: "/profile/2hungryguys",
-      newUserCallbackURL: "/onboarding"
+      callbackURL: "/auth",
     });
-
   };
 
   return (

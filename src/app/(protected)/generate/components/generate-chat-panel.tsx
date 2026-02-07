@@ -302,7 +302,6 @@ export function GenerateChatPanel({ className }: GenerateChatPanelProps) {
             value={inputValue}
             onChange={(event) => setInputValue(event.target.value)}
             placeholder="Share thoughts, reactions, or questions... I'm here to help shape ideas with you."
-            placeholder="Share thoughts, reactions, or questions... I'm here to help shape ideas with you."
             className="min-h-[120px] resize-none"
             disabled={isLoading || isInitializing}
           />

@@ -3,26 +3,28 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 
+import { SignOutButton } from "@/components/SignOut"
+import { ThemeToggle } from "@/components/theme-toggle"
 import {
   NavigationMenu,
   NavigationMenuItem,
   NavigationMenuLink,
   NavigationMenuList,
 } from "@/components/ui/navigation-menu"
-import { SignOutButton } from "@/components/SignOut"
-import { ThemeToggle } from "@/components/theme-toggle"
 import { cn } from "@/lib/utils"
+import { useUserStore } from "@/store/user-store"
 
-
-const navItems = [
-  { label: "Profile", href: "/profile/2hungryguys" },
-  { label: "Chat", href: "/chat" },
-  { label: "Generate", href: "/generate" },
-  { label: "Plan", href: "/plan" },
-]
 
 export function GeneratorNav() {
   const pathname = usePathname()
+  const { username } = useUserStore()
+
+  const navItems = [
+    { label: "Profile", href: username ? `/profile/${username}` : "/profile" },
+    { label: "Chat", href: "/chat" },
+    { label: "Generate", href: "/generate" },
+    { label: "Plan", href: "/plan" },
+  ]
 
   return (
     <div className="flex flex-col gap-4 rounded-lg border bg-card/60 p-6 shadow-sm lg:flex-row lg:items-center lg:gap-6">

@@ -1,16 +1,19 @@
 "use client";
 
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import {
-confirmOnboarding,
-createOnboardingSession,
-sendOnboardingMessage,
-submitOnboardingVideos,
-type OnboardingStage,
-} from "@/lib/onboarding-rest";
-import ReactMarkdown from "react-markdown";
 import { uploadThreeVideosToGCS } from "@/lib/gcsUpload";
+import {
+    confirmOnboarding,
+    createOnboardingSession,
+    sendOnboardingMessage,
+    submitOnboardingVideos,
+    type OnboardingStage,
+} from "@/lib/onboarding-rest";
 import { subscribeOnboardingEvents, type OnboardingEventRow } from "@/lib/onboardingEvents";
+import { createOrUpdateUser } from "@/lib/user-data";
+import { useUserStore } from "@/store/user-store";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useMemo, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 // ---- UI helpers (keep minimal / replace with your own components) ----
 type ChatMsg = { role: "user" | "assistant"; content: React.ReactNode; ts: number };
@@ -76,6 +79,8 @@ return <span className="inline-flex items-center rounded-full border border-bord
 }
 
 export default function ConversationPage() {
+const router = useRouter();
+const { email: userEmail } = useUserStore();
 const [sessionId, setSessionId] = useState<string | null>(null);
 const [stage, setStage] = useState<Stage>("awaiting-name");
 const [messages, setMessages] = useState<ChatMsg[]>([]);
@@ -254,6 +259,26 @@ const handleEvent = (row: OnboardingEventRow) => {
 
     if (type === "complete") {
         setStage("completion");
+        // Extract username from payload and route to profile
+        const completionData = payload?.data ?? payload;
+        const profileUsername = completionData?.username ?? userName ?? "unknown";
+        
+        // Create/update user in Supabase
+        (async () => {
+            try {
+                await createOrUpdateUser({
+                    username: profileUsername,
+                    email: userEmail ?? undefined,
+                    recommendation_json: completionData,
+                });
+            } catch (e) {
+                console.error("Failed to create user:", e);
+            }
+        })();
+        
+        setTimeout(() => {
+            router.push(`/profile/${encodeURIComponent(profileUsername)}`);
+        }, 2000);
     return;
     }
 

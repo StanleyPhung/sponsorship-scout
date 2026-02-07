@@ -1,11 +1,14 @@
 "use client";
 
-import React, { useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { fetchUserByEmail } from "@/lib/user-data";
+import { useUserStore } from "@/store/user-store";
 import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 
 export default function AuthSignIn() {
   const router = useRouter();
+  const { setEmail: setStoreEmail, setUsername: setStoreUsername } = useUserStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -24,16 +27,31 @@ export default function AuthSignIn() {
     const { error } = await authClient.signIn.email({
       email,
       password,
-      callbackURL: "/profile/2hungryguys",
     });
-    setBusy(false);
 
     if (error) {
+      setBusy(false);
       setErr(error.message ?? "Sign in failed");
       return;
     }
 
-    router.push("/profile/2hungryguys");
+    // Query Supabase User table by email
+    try {
+      const userData = await fetchUserByEmail(email);
+      setBusy(false);
+      
+      if (userData.username) {
+        setStoreEmail(email);
+        setStoreUsername(userData.username);
+        router.push(`/profile/${userData.username}`);
+      } else {
+        setErr("User profile not found");
+      }
+    } catch (err) {
+      setBusy(false);
+      console.error("Failed to fetch user from Supabase:", err);
+      setErr("Failed to load user profile");
+    }
   };
 
   return (

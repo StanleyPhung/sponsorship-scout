@@ -1,11 +1,13 @@
 "use client";
 
-import React, { useState } from "react";
 import { authClient } from "@/lib/auth-client";
+import { useUserStore } from "@/store/user-store";
 import { useRouter } from "next/navigation";
+import React, { useState } from "react";
 
 export default function AuthSignUp() {
   const router = useRouter();
+  const { setEmail: setStoreEmail, setName: setStoreName } = useUserStore();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -38,6 +40,10 @@ export default function AuthSignUp() {
       setErr(error.message ?? "Sign up failed");
       return;
     }
+
+    // Store email and name in global store
+    setStoreEmail(email);
+    setStoreName(name);
 
     router.push("/conversation");
   };
