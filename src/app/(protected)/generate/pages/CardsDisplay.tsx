@@ -125,7 +125,7 @@ function todayKey(): string {
 function loadQuota(): QuotaState {
   if (typeof window === "undefined") return { date: todayKey(), used: 0 };
   try {
-    const raw = localStorage.getItem(QUOTA_KEY);
+    const raw = sessionStorage.getItem(QUOTA_KEY);
     if (!raw) return { date: todayKey(), used: 0 };
     const parsed = JSON.parse(raw) as QuotaState;
     if (parsed.date !== todayKey()) return { date: todayKey(), used: 0 };
@@ -138,7 +138,7 @@ function loadQuota(): QuotaState {
 
 function saveQuota(q: QuotaState) {
   if (typeof window === "undefined") return;
-  localStorage.setItem(QUOTA_KEY, JSON.stringify(q));
+  sessionStorage.setItem(QUOTA_KEY, JSON.stringify(q));
 }
 
 export default function DeckPage() {

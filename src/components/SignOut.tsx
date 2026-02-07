@@ -16,7 +16,7 @@ export function SignOutButton() {
       size="sm"
       onClick={() => {
         // Clean up localStorage
-        localStorage.removeItem("onboarding_session_id");
+        sessionStorage.removeItem("onboarding_session_id");
         // Reset Zustand user store
         clearStore();
         // Sign out via auth client

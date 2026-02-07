@@ -63,13 +63,13 @@ export function GenerateChatPanel({ className }: GenerateChatPanelProps) {
   const [error, setError] = React.useState<string | null>(null)
   const scrollRef = React.useRef<HTMLDivElement>(null)
 
-  // Initialize session on mount - restore from localStorage or create new
+  // Initialize session on mount - restore from sessionStorage or create new
   React.useEffect(() => {
     const initSession = async () => {
       setIsInitializing(true)
       
-      // Check for existing session in localStorage
-      const storedSessionId = localStorage.getItem(GENERATE_SESSION_STORAGE_KEY)
+      // Check for existing session in sessionStorage
+      const storedSessionId = sessionStorage.getItem(GENERATE_SESSION_STORAGE_KEY)
       
       if (storedSessionId) {
         try {
@@ -94,7 +94,7 @@ export function GenerateChatPanel({ className }: GenerateChatPanelProps) {
         } catch (err) {
           console.error("Failed to restore session, creating new one:", err)
           // Session expired or invalid, remove from storage
-          localStorage.removeItem(GENERATE_SESSION_STORAGE_KEY)
+          sessionStorage.removeItem(GENERATE_SESSION_STORAGE_KEY)
         }
       }
       
@@ -104,7 +104,7 @@ export function GenerateChatPanel({ className }: GenerateChatPanelProps) {
           "You are a creative AI assistant helping content creators refine their ideas, vision, and unique content concepts. Provide helpful suggestions and engage thoughtfully with their creative process."
         )
         setSessionId(response.session_id)
-        localStorage.setItem(GENERATE_SESSION_STORAGE_KEY, response.session_id)
+        sessionStorage.setItem(GENERATE_SESSION_STORAGE_KEY, response.session_id)
         setError(null)
       } catch (err) {
         console.error("Failed to create session:", err)
@@ -194,7 +194,7 @@ export function GenerateChatPanel({ className }: GenerateChatPanelProps) {
     if (sessionId) {
       try {
         await deleteChatSession(sessionId)
-        localStorage.removeItem(GENERATE_SESSION_STORAGE_KEY)
+        sessionStorage.removeItem(GENERATE_SESSION_STORAGE_KEY)
       } catch (err) {
         console.error("Failed to delete old session:", err)
       }
@@ -210,7 +210,7 @@ export function GenerateChatPanel({ className }: GenerateChatPanelProps) {
         "You are a creative AI assistant helping content creators refine their ideas, vision, and unique content concepts. Provide helpful suggestions and engage thoughtfully with their creative process."
       )
       setSessionId(response.session_id)
-      localStorage.setItem(GENERATE_SESSION_STORAGE_KEY, response.session_id)
+      sessionStorage.setItem(GENERATE_SESSION_STORAGE_KEY, response.session_id)
     } catch (err) {
       console.error("Failed to create new session:", err)
       setError("Failed to start new chat. Please try again.")

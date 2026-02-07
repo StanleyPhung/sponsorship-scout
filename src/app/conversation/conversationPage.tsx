@@ -151,7 +151,7 @@ useEffect(() => {
     async function boot() {
     try {
         setIsLoading(true);
-        const cached = typeof window !== "undefined" ? localStorage.getItem("onboarding_session_id") : null;
+        const cached = typeof window !== "undefined" ? sessionStorage.getItem("onboarding_session_id") : null;
         if (cached) {
         if (!cancelled) setSessionId(cached);
         return;
@@ -159,7 +159,7 @@ useEffect(() => {
         const created = await createOnboardingSession();
         if (cancelled) return;
         setSessionId(created.session_id);
-        localStorage.setItem("onboarding_session_id", created.session_id);
+        sessionStorage.setItem("onboarding_session_id", created.session_id);
     } catch (e) {
         console.error(e);
         addAssistant(<p className="text-sm text-red-600">Failed to create session.</p>);
@@ -852,7 +852,7 @@ return (
             {/* <Button
                 variant="outline"
                 onClick={() => {
-                localStorage.removeItem("onboarding_session_id");
+                sessionStorage.removeItem("onboarding_session_id");
                 window.location.reload();
                 }}
             >

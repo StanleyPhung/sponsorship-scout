@@ -65,13 +65,13 @@ export function ResearchChatPanel({ inputValue, onInputChange }: ResearchChatPan
   const [error, setError] = React.useState<string | null>(null)
   const scrollRef = React.useRef<HTMLDivElement>(null)
 
-  // Initialize session on mount - restore from localStorage or create new
+  // Initialize session on mount - restore from sessionStorage or create new
   React.useEffect(() => {
     const initSession = async () => {
       setIsInitializing(true)
       
-      // Check for existing session in localStorage
-      const storedSessionId = localStorage.getItem(RESEARCH_SESSION_STORAGE_KEY)
+      // Check for existing session in sessionStorage
+      const storedSessionId = sessionStorage.getItem(RESEARCH_SESSION_STORAGE_KEY)
       
       if (storedSessionId) {
         try {
@@ -96,7 +96,7 @@ export function ResearchChatPanel({ inputValue, onInputChange }: ResearchChatPan
         } catch (err) {
           console.error("Failed to restore session, creating new one:", err)
           // Session expired or invalid, remove from storage
-          localStorage.removeItem(RESEARCH_SESSION_STORAGE_KEY)
+          sessionStorage.removeItem(RESEARCH_SESSION_STORAGE_KEY)
         }
       }
       
@@ -106,7 +106,7 @@ export function ResearchChatPanel({ inputValue, onInputChange }: ResearchChatPan
           "You are a creative brainstorming AI assistant helping content creators shape ideas, explore brand partnerships, and refine their unique content style. Be conversational, supportive, and provide actionable suggestions."
         )
         setSessionId(response.session_id)
-        localStorage.setItem(RESEARCH_SESSION_STORAGE_KEY, response.session_id)
+        sessionStorage.setItem(RESEARCH_SESSION_STORAGE_KEY, response.session_id)
         setError(null)
       } catch (err) {
         console.error("Failed to create session:", err)
@@ -195,7 +195,7 @@ export function ResearchChatPanel({ inputValue, onInputChange }: ResearchChatPan
     if (sessionId) {
       try {
         await deleteChatSession(sessionId)
-        localStorage.removeItem(RESEARCH_SESSION_STORAGE_KEY)
+        sessionStorage.removeItem(RESEARCH_SESSION_STORAGE_KEY)
       } catch (err) {
         console.error("Failed to delete old session:", err)
       }
@@ -211,7 +211,7 @@ export function ResearchChatPanel({ inputValue, onInputChange }: ResearchChatPan
         "You are a creative brainstorming AI assistant helping content creators shape ideas, explore brand partnerships, and refine their unique content style. Be conversational, supportive, and provide actionable suggestions."
       )
       setSessionId(response.session_id)
-      localStorage.setItem(RESEARCH_SESSION_STORAGE_KEY, response.session_id)
+      sessionStorage.setItem(RESEARCH_SESSION_STORAGE_KEY, response.session_id)
     } catch (err) {
       console.error("Failed to create new session:", err)
       setError("Failed to start new chat. Please try again.")
