@@ -34,7 +34,7 @@ export class GenerateWebSocket {
     const { sessionId } = this.opts;
 
     const wsBase =
-      process.env.BACKEND_WS_URL ||
+      process.env.NEXT_PUBLIC_BACKEND_WS_URL ||
       (typeof window !== "undefined" && window.location.protocol === "https:"
         ? `wss://${window.location.host}`
         : `ws://${window.location.host}`);
