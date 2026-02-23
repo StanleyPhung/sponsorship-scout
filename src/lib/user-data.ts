@@ -47,8 +47,8 @@ export async function fetchUserByEmail(email: string) {
     .from("User")
     .select("*")
     .eq("email", email)
-    .single();
+    .maybeSingle();
 
   if (error) throw error;
-  return data as UserRow;
+  return data as UserRow | null;
 }

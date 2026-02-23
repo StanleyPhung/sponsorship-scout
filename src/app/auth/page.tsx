@@ -25,10 +25,13 @@ export default function AuthPage() {
       if (session?.data?.user?.email) {
         try {
           const userData = await fetchUserByEmail(session.data.user.email);
-          if (userData.username) {
+          if (userData?.username) {
             setStoreEmail(session.data.user.email);
             setStoreUsername(userData.username);
             router.push(`/profile/${userData.username}`);
+          } else {
+            // New OAuth user — no profile yet, send to onboarding
+            router.push("/onboarding");
           }
         } catch (err) {
           console.error("Failed to fetch user from Supabase after OAuth:", err);

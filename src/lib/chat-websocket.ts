@@ -40,23 +40,13 @@ export class ChatWebSocket {
    * Connect to the WebSocket server
    */
   connect(): void {
-    // WebSocket connections need to go directly to the backend
-    // Next.js rewrites don't support WebSocket upgrades
-    const isDev =
-      typeof window !== "undefined" &&
-      (window.location.hostname === "localhost" ||
-        window.location.hostname === "127.0.0.1")
+    const wsBase =
+      process.env.NEXT_PUBLIC_BACKEND_WS_URL ||
+      (typeof window !== "undefined" && window.location.protocol === "https:"
+        ? `wss://${window.location.host}`
+        : `ws://${window.location.host}`)
 
-    let wsUrl: string
-    if (isDev) {
-      // In development, connect directly to the backend
-      wsUrl = `ws://localhost:8000/ws/chat/${this.sessionId}`
-    } else {
-      // In production, use the same host with appropriate protocol
-      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:"
-      const host = window.location.host
-      wsUrl = `${protocol}//${host}/ws/chat/${this.sessionId}`
-    }
+    const wsUrl = `${wsBase}/ws/chat/${this.sessionId}`
 
     this.ws = new WebSocket(wsUrl)
 

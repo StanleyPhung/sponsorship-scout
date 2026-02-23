@@ -34,40 +34,28 @@ function safeFileName(name: string) {
 }
 
 function safePath(input: string) {
-  // avoid leading slashes, weird traversal, etc.
   const p = input.trim().replace(/^\/+/, "");
   if (!p || p.includes("..")) return null;
   return p;
 }
 
-export async function PUT(req: Request) {
+/**
+ * POST /api/upload/gcs
+ * Body (JSON): { sessionId, stage, fileName, contentType, stageIndex?, userName?, objectPath? }
+ * Returns: { ok, signedUrl, gcsUri, objectPath }
+ *
+ * The client then PUTs the raw file bytes directly to `signedUrl` (bypasses Vercel's 4.5 MB limit).
+ */
+export async function POST(req: Request) {
   try {
-    const form = await req.formData();
-
-    const file = form.get("file");
-    if (!(file instanceof File)) {
-      return NextResponse.json(
-        { ok: false, error: "Missing file", received: { keys: Array.from(form.keys()) } },
-        { status: 400 }
-      );
-    }
-
-    // Required for onboarding mapping
-    const sessionIdRaw = form.get("sessionId");
-    const stageRaw = form.get("stage"); // taste | performance | low_performance
-
-    // Optional, purely for path readability
-    const userNameRaw = form.get("userName");
-    const stageIndexRaw = form.get("stageIndex"); // "0" | "1" | "2" etc
-
-    // Optional: allow caller to provide exact objectPath
-    const objectPathRaw = form.get("objectPath");
+    const body = await req.json();
 
     const sessionId =
-      typeof sessionIdRaw === "string" && sessionIdRaw.trim() ? sessionIdRaw.trim() : null;
-
+      typeof body.sessionId === "string" && body.sessionId.trim()
+        ? body.sessionId.trim()
+        : null;
     const stage =
-      typeof stageRaw === "string" && stageRaw.trim() ? slugify(stageRaw) : null;
+      typeof body.stage === "string" && body.stage.trim() ? slugify(body.stage) : null;
 
     if (!sessionId) {
       return NextResponse.json({ ok: false, error: "Missing sessionId" }, { status: 400 });
@@ -79,69 +67,61 @@ export async function PUT(req: Request) {
       );
     }
 
+    const contentType =
+      typeof body.contentType === "string" && body.contentType.trim()
+        ? body.contentType.trim()
+        : "video/mp4";
+    const fileName =
+      typeof body.fileName === "string" && body.fileName.trim()
+        ? safeFileName(body.fileName)
+        : "upload.mp4";
     const userName =
-      typeof userNameRaw === "string" && userNameRaw.trim()
-        ? slugify(userNameRaw)
+      typeof body.userName === "string" && body.userName.trim()
+        ? slugify(body.userName)
         : "anonymous";
-
     const stageIndex =
-      typeof stageIndexRaw === "string" && stageIndexRaw.trim()
-        ? slugify(stageIndexRaw)
+      typeof body.stageIndex === "string" || typeof body.stageIndex === "number"
+        ? String(body.stageIndex)
         : "";
 
     let objectPath: string | null = null;
-
-    if (typeof objectPathRaw === "string" && objectPathRaw.trim()) {
-      objectPath = safePath(objectPathRaw);
+    if (typeof body.objectPath === "string" && body.objectPath.trim()) {
+      objectPath = safePath(body.objectPath);
       if (!objectPath) {
         return NextResponse.json({ ok: false, error: "Invalid objectPath" }, { status: 400 });
       }
     } else {
       const ts = new Date().toISOString().replace(/[:.]/g, "-");
       const rand = crypto.randomBytes(8).toString("hex");
-      const filename = safeFileName(file.name);
-
-      // ✅ IMPORTANT: include sessionId + stage in object path
-      // This makes it trivial for FE to send gs://... to ad-crawler for the right session/stage.
-      objectPath = `onboarding/${sessionId}/${stage}/${userName}/${ts}-${stageIndex}-${rand}-${filename}`;
-    }
-
-    const contentType = file.type || "application/octet-stream";
-    const bytes = Buffer.from(await file.arrayBuffer());
-
-    // Guardrail: don't accept huge uploads via server route (optional but recommended)
-    // Example: 200MB max. Adjust as needed.
-    const maxBytes = 200 * 1024 * 1024;
-    if (bytes.length > maxBytes) {
-      return NextResponse.json(
-        { ok: false, error: `File too large for server upload route (>${maxBytes} bytes)` },
-        { status: 413 }
-      );
+      objectPath = `onboarding/${sessionId}/${stage}/${userName}/${ts}-${stageIndex}-${rand}-${fileName}`;
     }
 
     const bucket = storage.bucket(bucketName);
     const gcsFile = bucket.file(objectPath);
 
-    await gcsFile.save(bytes, {
-      resumable: false,
-      contentType,
-      metadata: { cacheControl: "private, max-age=0, no-transform" },
+    // Generate a signed URL valid for 15 minutes — client uploads directly to GCS
+    const [signedUrl] = await gcsFile.generateSignedPostPolicyV4({
+      expires: Date.now() + 15 * 60 * 1000,
+      conditions: [
+        ["content-length-range", 0, 200 * 1024 * 1024], // max 500 MB
+      ],
+      fields: { "Content-Type": contentType },
     });
 
     const gcsUri = `gs://${bucketName}/${objectPath}`;
 
     return NextResponse.json({
       ok: true,
+      signedUrl,
       gcsUri,
-      bucket: bucketName,
       objectPath,
+      bucket: bucketName,
       contentType,
-      size: bytes.length,
       sessionId,
       stage,
     });
   } catch (e: any) {
-    console.error("gcs upload error:", e);
+    console.error("gcs signed-url error:", e);
     return NextResponse.json({ ok: false, error: String(e?.message ?? e) }, { status: 500 });
   }
 }
