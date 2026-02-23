@@ -7,8 +7,7 @@ import React, { useState } from "react";
 
 export default function AuthSignUp() {
   const router = useRouter();
-  const { setEmail: setStoreEmail, setName: setStoreName } = useUserStore();
-  const [name, setName] = useState("");
+  const { setEmail: setStoreEmail } = useUserStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
@@ -18,8 +17,8 @@ export default function AuthSignUp() {
     e?.preventDefault();
     setErr(null);
 
-    if (!name || !email || !password) {
-      setErr("Please enter name, email and password.");
+    if (!email || !password) {
+      setErr("Please enter email and password.");
       return;
     }
     if (password.length < 6) {
@@ -27,9 +26,13 @@ export default function AuthSignUp() {
       return;
     }
 
+    // Use email prefix as a temporary placeholder — the real name is collected
+    // during the onboarding conversation (awaiting-name stage).
+    const tempName = email.split("@")[0];
+
     setBusy(true);
     const { error } = await authClient.signUp.email({
-      name,
+      name: tempName,
       email,
       password,
       callbackURL: "/onboarding",
@@ -41,23 +44,12 @@ export default function AuthSignUp() {
       return;
     }
 
-    // Store email and name in global store
     setStoreEmail(email);
-    setStoreName(name);
-
     router.push("/onboarding");
   };
 
   return (
     <form onSubmit={submit} className="space-y-3">
-      <label className="block text-xs">Name</label>
-      <input
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        className="w-full px-3 py-2 border rounded text-sm"
-        placeholder="Jane Doe"
-      />
-
       <label className="block text-xs">Email</label>
       <input
         type="email"

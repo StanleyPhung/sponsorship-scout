@@ -14,17 +14,17 @@ export default function TestPage() {
     const [loading, setLoading] = useState(false);
     const [messages, setMessages] = useState([]);
 
-    const [showHints, setShowHints] = useState(false);
+    // const [showHints, setShowHints] = useState(false);
     
     const blobRef = useRef(null);
     const idleTimer = useRef(null);
 
-    useEffect(() => {
-        const timer = setTimeout(() => setShowHints(true), 3000);
-        console.log("set timeout for hints", timer);
+    // useEffect(() => {
+    //     const timer = setTimeout(() => setShowHints(true), 3000);
+    //     console.log("set timeout for hints", timer);
 
-        return () => clearTimeout(timer);
-    }, []);
+    //     return () => clearTimeout(timer);
+    // }, []);
 
     const setBlob = useCallback((state, dur = 700) => {
         blobRef.current?.setState(state, { duration: dur });

@@ -276,8 +276,11 @@ export default function DeckPage() {
         }
 
         const userData = await fetchUserByEmail(session.data.user.email);
+        console.log("User data:", userData);
         
         const profileData = userData.recommendation_json?.data ?? userData.recommendation_json;
+
+        console.log("Profile data:", profileData);
 
         if (profileData) {
           // Extract USER_PROFILE: combine creative_dna fields into a string
@@ -331,6 +334,7 @@ export default function DeckPage() {
   }, []);
 
   async function generateIntoTrailingPlaceholder(extraFeedback?: string) {
+    console.log("Generating into trailing placeholder with extra feedback:", extraFeedback);
     if (loading) return;
     if (quotaReached) return;
     if (isLoadingProfile || !userProfile || !macroThemes) {
@@ -389,6 +393,7 @@ export default function DeckPage() {
     setLoading(true);
     setErrorMsg(null);
 
+    console.log("Generating with params:");
     try {
       // Use the placeholder id as the generator id (so it stays 0..n)
       const generated = await generateNextCard({
@@ -436,9 +441,15 @@ export default function DeckPage() {
   }
 
   // Auto-generate first card ONLY if we don't already have a real one in session storage
+  // Wait until profile is loaded before attempting generation
   useEffect(() => {
+    if (isLoadingProfile) return; // profile not ready yet, wait
+
     const hasReal = ideas.some((i) => !isPlaceholder(i));
+    console.log("Deck loaded. Has real idea?", hasReal, "isLoadingProfile:", isLoadingProfile, "Ideas:", ideas);
+
     if (hasReal) return;
+    console.log("No real idea found, auto-generating first card...");
 
     if (quotaReached) {
       setErrorMsg(`Daily limit reached (${DAILY_GEN_LIMIT}/day). Come back tomorrow.`);
@@ -448,7 +459,7 @@ export default function DeckPage() {
     // Generate into the (only) placeholder on first load
     generateIntoTrailingPlaceholder();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isLoadingProfile]);
 
   const handlePrev = (index: number) => {
     setCurrentIndex(index);

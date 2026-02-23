@@ -35,22 +35,23 @@ export default function AuthSignIn() {
       return;
     }
 
+    setBusy(false);
+
     // Query Supabase User table by email
+    // If no row exists yet the user hasn't finished onboarding — send them there.
     try {
       const userData = await fetchUserByEmail(email);
-      setBusy(false);
-      
-      if (userData.username) {
+      if (userData?.username) {
         setStoreEmail(email);
         setStoreUsername(userData.username);
         router.push(`/profile/${userData.username}`);
       } else {
-        setErr("User profile not found");
+        // Authenticated but no profile yet
+        router.push("/onboarding");
       }
-    } catch (err) {
-      setBusy(false);
-      console.error("Failed to fetch user from Supabase:", err);
-      setErr("Failed to load user profile");
+    } catch {
+      // fetchUserByEmail throws when no row is found — treat as incomplete onboarding
+      router.push("/onboarding");
     }
   };
 

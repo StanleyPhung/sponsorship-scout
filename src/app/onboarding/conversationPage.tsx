@@ -1,5 +1,6 @@
 "use client";
 
+import { authClient } from "@/lib/auth-client";
 import { uploadThreeVideosToGCS } from "@/lib/gcsUpload";
 import {
     confirmOnboarding,
@@ -11,12 +12,12 @@ import {
     type OnboardingStage,
     type OnboardingStateSnapshot,
 } from "@/lib/onboarding-rest";
+import { subscribeOnboardingEvents, type OnboardingEventRow } from "@/lib/onboardingEvents";
 import { createOrUpdateUser } from "@/lib/user-data";
 import { useUserStore } from "@/store/user-store";
-import { subscribeOnboardingEvents, type OnboardingEventRow } from "@/lib/onboardingEvents";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import ReactMarkdown from "react-markdown";
-import { useRouter } from "next/navigation";
 
 // ---- UI helpers (keep minimal / replace with your own components) ----
 type ChatMsg = { role: "user" | "assistant"; content: React.ReactNode; ts: number };
@@ -350,16 +351,21 @@ const handleEvent = (row: OnboardingEventRow) => {
         const completionData = payload?.data ?? payload;
         const profileUsername = completionData?.username ?? userName ?? "unknown";
         
-        // Create/update user in Supabase
+        // Create/update user in Supabase.
+        // Always read email from the live auth session so it is never null
+        // even if the user reloaded the page during onboarding (which clears useUserStore).
         (async () => {
             try {
+                const session = await authClient.getSession();
+                const sessionEmail = session?.data?.user?.email ?? userEmail ?? undefined;
                 await createOrUpdateUser({
                     username: profileUsername,
-                    email: userEmail ?? undefined,
+                    email: sessionEmail,
                     recommendation_json: completionData,
                 });
+                console.log("[onboarding] User saved:", profileUsername, sessionEmail);
             } catch (e) {
-                console.error("Failed to create user:", e);
+                console.error("[onboarding] Failed to create user:", e);
             }
         })();
         
@@ -389,6 +395,9 @@ const onSubmitName = async () => {
     setUserName(name);
     addUser(<p className="text-sm">{name}</p>);
     setInput("");
+
+    // Sync the real name back to the auth record (signup used a placeholder)
+    authClient.updateUser({ name }).catch(console.error);
 
     setIsLoading(true);
     try {

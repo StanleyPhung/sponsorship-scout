@@ -22,7 +22,7 @@ export async function createOrUpdateUser(params: {
         email: params.email ?? null,
         recommendation_json: params.recommendation_json,
       },
-      { onConflict: 'email' }
+      { onConflict: 'username' }
     )
     .select()
     .single();
