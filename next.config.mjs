@@ -10,16 +10,14 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH, // Sets the base path for the application.,
   reactStrictMode: true,
   async rewrites() {
-    // Skip rewrites if no backend URL is configured (e.g. build-time without env vars)
-    if (!backendUrl) return [];
+    // /api/v1/* is handled by the catch-all proxy at src/app/api/v1/[...path]/route.ts
+    // Only proxy WebSocket upgrades via rewrites.
+    const wsBase = process.env.BACKEND_URL_PROD || process.env.BACKEND_URL_DEV;
+    if (!wsBase || !wsBase.startsWith('http')) return [];
     return [
       {
-        source: '/api/v1/:path*',
-        destination: `${backendUrl}/api/v1/:path*`,
-      },
-      {
         source: '/ws/:path*',
-        destination: `${backendUrl}/ws/:path*`,
+        destination: `${wsBase}/ws/:path*`,
       },
     ]
   },
