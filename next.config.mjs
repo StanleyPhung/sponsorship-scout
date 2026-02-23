@@ -10,6 +10,8 @@ const nextConfig = {
   basePath: process.env.NEXT_PUBLIC_BASE_PATH, // Sets the base path for the application.,
   reactStrictMode: true,
   async rewrites() {
+    // Skip rewrites if no backend URL is configured (e.g. build-time without env vars)
+    if (!backendUrl) return [];
     return [
       {
         source: '/api/v1/:path*',
